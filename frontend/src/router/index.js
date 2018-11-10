@@ -3,11 +3,17 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-import Home from '../components/Home'
-import Movies from '../components/Movies'
-import MovieInfo from '../components/MovieInfo'
+import NotFound from '@/components/NotFound'
+import Home from '@/components/Home'
+import Movies from '@/components/Movies'
+import MovieInfo from '@/components/MovieInfo'
 export default new Router({
+  mode: 'history',
   routes: [
+    {
+      path: '*',
+      component: NotFound
+    },
     {
       path: '/',
       name: 'home',
