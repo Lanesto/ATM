@@ -1,15 +1,11 @@
 var express = require('express');
+var path = require('path');
 var router = express.Router();
 var orcldb = require('../db/db_con');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    orcldb.run('SELECT * FROM customer', function(result) {
-        res.render('index', {
-            title: 'Express',
-            contents: result.rows || 'Hello Friend!'
-        })
-    })
+    res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
 module.exports = router;

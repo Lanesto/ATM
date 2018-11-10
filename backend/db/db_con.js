@@ -1,6 +1,7 @@
 var orcldb = require('oracledb');
 var config = require('../secrets/db_config').remote;
 
+// For better perfomance, think about creating pool for db access (later)
 orcldb.autoCommit = true;
 function run(sql, callback) {
     orcldb.getConnection({
@@ -14,11 +15,7 @@ function run(sql, callback) {
         }
         connection.execute(sql, function(err, result) {
             release(connection);
-            if (err) {
-                console.error(err.message);
-                return;
-            }
-            callback(result);
+            callback(err, result);
         });
     });
 }
@@ -35,11 +32,7 @@ function bind(sql, data, callback) {
         }
         connection.execute(sql, data, function(err, result) {
             release(connection);
-            if (err) {
-                console.error(err.message);
-                return;
-            }
-            callback(result);
+            callback(err, result);
         });
     });
 }
@@ -51,4 +44,5 @@ function release(connection) {
 }
 
 exports.run = run;
+exports.bind = bind;
 exports.release = release;
