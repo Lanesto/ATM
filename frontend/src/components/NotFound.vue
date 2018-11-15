@@ -5,11 +5,11 @@
 </template>
 
 <script>
-    export default {
-        data: function() {
-            return {
-                msg: '404 Not Found'
-            }
+export default {
+    data: function() {
+        return {
+            msg: '404 Not Found'
         }
     }
+}
 </script>

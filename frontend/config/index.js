@@ -17,6 +17,13 @@ module.exports = {
         pathRewrite: {
           '^/api': ''
         }
+      },
+      '/auth': {
+        target: 'http://localhost:3000/auth',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/auth': ''
+        }
       }
     },
 

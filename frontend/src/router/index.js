@@ -4,13 +4,12 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 import NotFound from '@/components/NotFound'
-import Home from '@/components/Home'
-import Movies from '@/components/Movies'
-import MovieInfo from '@/components/MovieInfo'
+import Home from '@/components/home'
+import Movie from '@/components/movie/index'
 export default new Router({
   mode: 'history',
   routes: [
-    {
+    { // 404
       path: '*',
       component: NotFound
     },
@@ -20,14 +19,9 @@ export default new Router({
       component: Home
     },
     {
-      path: 'movies/',
-      name: 'movies',
-      component: Movies
-    },
-    {
-      path: 'movies/:id',
-      name: 'movie-info',
-      component: MovieInfo
+      path: '/movie',
+      name: 'movie',
+      component: Movie
     }
   ]
 })

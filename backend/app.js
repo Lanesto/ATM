@@ -3,12 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var moviesRouter = require('./routes/movies');
-
 var app = express();
+var expressListEndpoints = require('express-list-endpoints');
+
 app.use(require('connect-history-api-fallback')());
 
 // view engine setup
@@ -21,9 +18,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/api/movies', moviesRouter);
+app.use('/', require('./routes/index'));
+app.use('/api', require('./routes/api/index'));
+app.use('/auth', require('./routes/auth/index'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -40,5 +37,7 @@ app.use(function(err, req, res, next) {
 	res.status(err.status || 500);
 	res.render('error');
 });
+
+console.log(expressListEndpoints(app));
 
 module.exports = app;
