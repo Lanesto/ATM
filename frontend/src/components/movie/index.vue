@@ -1,16 +1,20 @@
 <template>
-    <div class="movies">
-        <movie-info v-for="movie in movies" :key="movie.movieID" v-bind="movie"/>
-    </div>
+    <b-container fluid>
+        <b-card-group>
+            <movie-info v-bind="movie" v-for="movie in movies" :key="movie.MovieID"/>
+        </b-card-group>
+        <b-button block variant="outline-primary" @click="bringMovies" :Disabled="isEnd"
+                        class="my-2">{{ btnText }}</b-button>
+    </b-container>
 </template>
 
 <script>
 import MovieInfo from './movie-info'
 
-const loadCount = 4
-var loadStart= 0 // search by MovieID
 export default {
-    name: 'movie',
+    components: {
+        'movie-info': MovieInfo
+    },
     created() {
         window.onscroll = () => {
             let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
@@ -20,34 +24,34 @@ export default {
         };
         this.bringMovies()
     },
-    data: function() {
+    data() {
         return {
-            movies: []
+            movies: [],
+            loadPoint: 0,
+            btnText: 'Bring me more',
+            isEnd: false
         }
     },
     methods: {
         bringMovies() {
+            const loadCount = 8
+            if (this.isEnd) return;
             this.$http.get('api/movie', {
                 params: {
-                    from: loadStart,
-                    to: loadStart + loadCount - 1
+                    from: this.loadPoint,
+                    to: this.loadPoint + loadCount - 1
                 }
             }).then((res) => {
                 let data = res.data
                 if (data.length > 0) {
                     this.movies.push(...data)
-                    loadStart += data.length;
+                    this.loadPoint += data.length;
+                } else {
+                    this.isEnd = true;
+                    this.btnText = 'We brought all the movies for you'
                 }
             })
         }
-
-    },
-    components: {
-        'movie-info': MovieInfo
     }
 }
 </script>
-
-<style>
-
-</style>

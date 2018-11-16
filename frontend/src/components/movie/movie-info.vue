@@ -1,19 +1,17 @@
 <template>
-    <div class="card-wrapper">
-        <div class="card-wrapper" @click="showModal">
-            <b-card :title="this.MovieTitle"
-                    :img-src="this.PosterIMG"
-                    img-alt="Image"
-                    img-top
-                    tag="article"
-                    style="max-width: 14rem;"
-                    class="mb-2">
-                <p class="card-text">
-                    A Movie!
-                </p>
-            </b-card>
-        </div>
-        <b-modal ref="modalRef" hide-footer title="Film Information">
+    <div>
+        <b-card @click="showModal"
+                :title="this.MovieTitle"
+                :img-src="this.PosterIMG"
+                img-alt="Image"
+                img-top
+                style="max-width: 14rem;"
+                class="mx-1 my-1">
+            <p class="card-text">
+                A Movie!
+            </p>
+        </b-card>
+        <b-modal lazy ref="modalRef" hide-footer title="Film Information">
             <div class="d-block text-center">
             <h3>Hello From My Modal!</h3>
             </div>

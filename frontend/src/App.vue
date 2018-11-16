@@ -5,7 +5,7 @@
 							:user-name="userName" 
 							:logged-on="logonStatus"
 							@showLoginModal="showModal"
-							@logout="onSignOut"/>
+							@signOut="onSignOut"/>
 		<router-view/>
 		<app-footer/>
 		<!-- not seen by default -->
@@ -58,7 +58,3 @@ export default {
 	},
 }
 </script>
-
-<style>
-
-</style>

@@ -13,13 +13,14 @@ module.exports = function(req, res, next) {
                     UserName: decoded.UserName
                 }, jwtConfig.secret, jwtConfig.options)
             })
-        } else throw "InvalidTokenError";
+        } else throw 'InvalidTokenError';
     } catch(e) {
-        console.log('auth/refresh: refresh failure, expired or invalid');
-        if (e == "InvalidTokenError") {
+        if (e == 'InvalidTokenError') {
             res.status(401).send({ message: 'Expired or Invalid Token' });
+            console.log('auth/refresh: refresh failure, invalid token');
         } else {
-            res.status(500).send({ message: 'Refresh Failed' })
+            res.status(500).send({ message: 'Internal Server Error' })
+            console.log(e);
         }
     }
 };
