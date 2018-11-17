@@ -6,9 +6,9 @@
 							:logged-on="logonStatus"
 							@showLoginModal="showModal"
 							@signOut="onSignOut"/>
-		<router-view/>
+		<router-view :key="$route.fullPath"/>
 		<app-footer/>
-		<!-- not seen by default -->
+		<!-- modals are not seen by default -->
         <app-login :show="LMVisible" 
 				@hideModal="hideModal" 
 				@login="onLoginSuccess"/>
@@ -20,7 +20,7 @@ import NavigationBar from '@/components/global/navigation-bar'
 import Footer from '@/components/global/footer'
 import Login from '@/components/global/login'
 
-export default {
+export default { // It also works as event bus
 	name: 'app',
 	components: {
 		'app-navigation-bar': NavigationBar, 

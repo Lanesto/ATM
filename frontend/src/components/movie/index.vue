@@ -3,8 +3,10 @@
         <b-card-group>
             <movie-info v-bind="movie" v-for="movie in movies" :key="movie.MovieID"/>
         </b-card-group>
-        <b-button block variant="outline-primary" @click="bringMovies" :Disabled="isEnd"
-                        class="my-2">{{ btnText }}</b-button>
+        <b-button class="my-2" 
+                  block variant="outline-primary" 
+                  :Disabled="isEnd"
+                  @click="BringMovies">{{ btnText }}</b-button>
     </b-container>
 </template>
 
@@ -19,36 +21,38 @@ export default {
         window.onscroll = () => {
             let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
             if (bottomOfWindow) {
-                this.bringMovies()
+                this.BringMovies()
             }
         };
-        this.bringMovies()
+        this.BringMovies()
     },
     data() {
         return {
             movies: [],
-            loadPoint: 0,
+            loadPoint: 1,
+            loadCount: 8,
             btnText: 'Bring me more',
             isEnd: false
         }
     },
     methods: {
-        bringMovies() {
-            const loadCount = 8
+        BringMovies() {
             if (this.isEnd) return;
             this.$http.get('api/movie', {
                 params: {
                     from: this.loadPoint,
-                    to: this.loadPoint + loadCount - 1
+                    to: this.loadPoint + this.loadCount - 1,
+                    search: this.$route.query.searchOption || ''
                 }
             }).then((res) => {
                 let data = res.data
                 if (data.length > 0) {
                     this.movies.push(...data)
                     this.loadPoint += data.length;
-                } else {
+                }
+                if (data.length < this.loadCount || data.length <= 0) {
                     this.isEnd = true;
-                    this.btnText = 'We brought all the movies for you'
+                    this.btnText = 'We brougth all the movies for you';
                 }
             })
         }

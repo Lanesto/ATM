@@ -1,21 +1,24 @@
 <template>
     <div>
-        <b-card @click="showModal"
-                :title="this.MovieTitle"
-                :img-src="this.PosterIMG"
+        <b-card class="mx-1 my-1" style="max-width: 14rem;"
+                img-top 
                 img-alt="Image"
-                img-top
-                style="max-width: 14rem;"
-                class="mx-1 my-1">
+                :img-src="this.PosterIMG"
+                :title="this.MovieTitle"
+                @click="showModal">
             <p class="card-text">
                 A Movie!
             </p>
         </b-card>
-        <b-modal lazy ref="modalRef" hide-footer title="Film Information">
+        <b-modal ref="modalRef" 
+                 lazy hide-footer
+                 title="Film Information">
             <div class="d-block text-center">
             <h3>Hello From My Modal!</h3>
             </div>
-            <b-btn class="mt-3" variant="outline-danger" block @click="hideModal">Close Me</b-btn>
+            <b-btn class="mt-3" 
+                   block variant="outline-danger"
+                   @click="hideModal">Close</b-btn>
         </b-modal>
     </div>
 </template>

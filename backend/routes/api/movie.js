@@ -3,6 +3,7 @@ var oracledb = require('../../db/oracledb');
 // Add TrailerURL
 module.exports = function(req, res, next) {
     q = req.query;
+    q.search = q.search || '';
     oracledb.bind("\
         SELECT MovieID, \
         MovieTitle, \
@@ -13,8 +14,17 @@ module.exports = function(req, res, next) {
         Actors, \
         Description, \
         PosterIMG \
-        FROM Movies \
-        WHERE MovieID BETWEEN :0 AND :1", [
+        FROM ( \
+            SELECT Q.*, ROWNUM N \
+            FROM ( \
+                SELECT * \
+                FROM Movies \
+                WHERE MovieTitle LIKE :0 \
+                ORDER BY ReleaseDate DESC \
+            ) Q \
+        ) \
+        WHERE N BETWEEN :1 AND :2", [
+        `%${q.search}%`,
         parseInt(q.from, 10),
         parseInt(q.to, 10)
     ], function(err, result) {
@@ -23,7 +33,7 @@ module.exports = function(req, res, next) {
             arr = [];
             rows = result.rows;
             for (var i in rows) {
-                row = rows[i]; // drop ROWNUM
+                row = rows[i];
                 let obj = {
                     MovieID: -1,
                     MovieTitle: '',

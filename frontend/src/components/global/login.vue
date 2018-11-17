@@ -1,52 +1,64 @@
 <template>
-    <b-modal ref="loginModal" v-model="this.show" @hide="onHide"
+    <b-modal ref="loginModal"
+            hide-header hide-footer
             body-bg-variant="dark"
-            hide-header hide-footer>
-         <b-carousel
-                :controls="!sliding"
-                :interval="0"
-                img-width="4rem"
-                img-height="4rem"
-                @sliding-start="onSlideStart"
-                @sliding-end="onSlideEnd"
-                v-model="slide">
+            v-model="this.show"
+            @hide="OnHideModal">
+         <b-carousel :controls="!sliding"
+                     :interval="0"
+                     img-width="4rem"
+                     img-height="4rem"
+                     v-model="slide"
+                     @sliding-start="OnSlideStart"
+                     @sliding-end="OnSlideEnd">
             <b-carousel-slide img-blank>
-                <b-alert dismissible class="mb-4" :show="loginFeedback" variant="danger"
-                        @dismissed="login.errMsg='';">{{ login.errMsg }}</b-alert>
+                <b-alert class="mb-4" 
+                         dismissible variant="danger"
+                         :show="LoginFeedback" 
+                         @dismissed="login.errMsg='';">{{ login.errMsg }}</b-alert>
                 <h2 class="mb-2">Welcome Back!</h2>
-                <b-form @submit="tryLogin">
-                    <b-input-group prepend="ID" class="my-2">
-                        <b-form-input required v-model="login.id"></b-form-input>
+                <b-form @submit="LoginRequest">
+                    <b-input-group class="my-2" prepend="ID">
+                        <b-form-input type="text" required v-model="login.id"/>
                     </b-input-group>
-                    <b-input-group prepend="Password" class="my-2">
-                        <b-form-input type="password" required v-model="login.password"></b-form-input>
+                    <b-input-group class="my-2" prepend="Password">
+                        <b-form-input type="password" required 
+                                      v-model="login.password"/>
                     </b-input-group>
-                    <b-button block class="mt-3" type="submit" variant="primary">Log In</b-button>
+                    <b-button class="mt-3" type="submit"
+                              block variant="primary">Log In</b-button>
                 </b-form>
             </b-carousel-slide>
             <b-carousel-slide img-blank>
-                <b-alert dismissible class="mb-4" :show="registerFeedback" variant="danger"
-                        @dismissed="register.errMsg='';">{{ register.errMsg }}</b-alert>
+                <b-alert class="mb-4" 
+                         dismissible :show="RegitserFeedback" variant="danger"
+                         @dismissed="register.errMsg='';">{{ register.errMsg }}</b-alert>
                 <h2 class="mb-2">New Account</h2>
-                <b-form @submit="newRegister">
-                    <b-input-group prepend="ID" class="my-1">
-                        <b-form-input required v-model="register.id"></b-form-input>
+                <b-form @submit="RegisterRequest">
+                    <b-input-group class="my-1" prepend="ID">
+                        <b-form-input type="text" 
+                                      required 
+                                      v-model="register.id"/>
                     </b-input-group>
-                    <b-input-group prepend="Password" class="my-1">
-                        <b-form-input type="password" required v-model="register.password"></b-form-input>
+                    <b-input-group class="my-1" prepend="Password">
+                        <b-form-input type="password" 
+                                      required 
+                                      v-model="register.password"/>
                     </b-input-group>
-                    <b-input-group prepend="Name" class="my-1">
-                        <b-form-input required v-model="register.name"></b-form-input>
+                    <b-input-group class="my-1" prepend="Name">
+                        <b-form-input required v-model="register.name"/>
                     </b-input-group>
-                    <b-input-group prepend="Age" class="my-1">
-                        <b-form-input required v-model="register.age"></b-form-input>
-                        <b-form-radio-group buttons required v-model="register.gender"
-                            button-variant="outline-success">
+                    <b-input-group class="my-1" prepend="Age">
+                        <b-form-input required v-model="register.age"/>
+                        <b-form-radio-group required
+                                            buttons button-variant="outline-success"
+                                            v-model="register.gender">
                             <b-form-radio value="M">Male</b-form-radio>
                             <b-form-radio value="F">Female</b-form-radio>
                         </b-form-radio-group>
                     </b-input-group>
-                    <b-button block class="mt-1" type="submit" variant="primary">Sign Up</b-button>
+                    <b-button class="mt-1" type="submit" 
+                              block variant="primary">Sign Up</b-button>
                 </b-form>
             </b-carousel-slide>
         </b-carousel>
@@ -76,24 +88,16 @@ export default {
         }
     },
     computed: {
-        loginFeedback() {
-            return this.login.errMsg ? true : false;
-        },
-        registerFeedback() {
-            return this.register.errMsg ? true : false;
-        }
+        LoginFeedback() { return this.login.errMsg ? true : false; },
+        RegitserFeedback() { return this.register.errMsg ? true : false; }
     },
     methods: {
-        onHide(evt) {
+        OnHideModal(evt) {
             this.$emit('hideModal');
         },
-        onSlideStart (slide) {
-            this.sliding = true;
-        },
-        onSlideEnd (slide) {
-            this.sliding = false;
-        },
-        tryLogin(evt) {
+        OnSlideStart (slide) { this.sliding = true; },
+        OnSlideEnd (slide) { this.sliding = false; },
+        LoginRequest(evt) {
             evt.preventDefault();
             this.$http.post('auth/login', {
                 id: this.login.id,
@@ -106,17 +110,19 @@ export default {
                 this.$refs.loginModal.hide();
                 this.login.errMsg = '';
             }).catch(err => {
+                var msg = '';
                 if (err.response) { // Response Error
-                    let res = err.response;
-                    this.login.errMsg = `(${res.status}) ${res.data.message}`;
+                    var res = err.response;
+                    msg = `(${res.status}) ${res.data.message}`;
                 } else if (err.request) { // Server Error
-                    this.login.errMsg = err.message;
+                    msg = err.message;
                 } else { // Request Error
-                    this.login.errMsg = err.message;
+                    msg = err.message;
                 }
+                this.login.errMsg = `(${res.status}) ${msg}`
             });
         },
-        newRegister(evt) {
+        RegisterRequest(evt) {
             evt.preventDefault();
             this.$http.put('auth/register', {
                 id: this.register.id,
@@ -139,23 +145,18 @@ export default {
                 };
                 this.register.errMsg = '';
             }).catch(err => {
+                var msg = '';
                 if (err.response) { // Response Error
-                    let res = err.response;
-                    this.register.errMsg = `(${res.status}) ${res.data.message}`;
+                    var res = err.response;
+                    msg = `(${res.status}) ${res.data.message}`;
                 } else if (err.request) { // Server Error
-                    this.register.errMsg = err.message;
+                    msg = err.message;
                 } else { // Request Error
-                    this.register.errMsg = err.message;
+                    msg = err.message;
                 }
+                this.register.errMsg = `(${res.status}) ${msg}`
             })
         }
     }
 }
 </script>
-
-<style scoped>
-b-img:focus {
-    border: none;
-}
-</style>
-
