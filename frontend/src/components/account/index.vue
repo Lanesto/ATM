@@ -36,6 +36,14 @@ export default {
 		return {
 			msg: 'Account'
 		}
+	},
+	methods: {
+		bringPrivates() {
+
+		},
+		bringReservations() {
+
+		}
 	}
 }
 </script>

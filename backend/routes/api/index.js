@@ -7,6 +7,6 @@ router.get('/', function(req, res, next) {
 
 router.get('/movie', require('./movie'));
 router.use('/comment', require('./comment'));
-router.use('/board', require('./board'));
+router.use('/reservate', require('./reservate'));
 
 module.exports = router;

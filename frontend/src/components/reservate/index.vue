@@ -34,6 +34,17 @@ export default {
 		return {
 			msg: 'Reservate'
 		}
+	},
+	methods: {
+		bringSchedules() {
+
+		},
+		reservate() {
+
+		},
+		cancelReservation() {
+
+		}
 	}
 }
 </script>

@@ -56,5 +56,24 @@ export default { // It also works as event bus
 			delete sessionStorage['token'];
 		}
 	},
+	created() {
+		setInterval(() => { // autorefresh token
+			if (this.logonStatus) {
+				this.$http.post('auth/refresh', {}, {
+					headers: {
+						'Authorization': `Bearer ${sessionStorage['token']}`
+					}
+				}).then((res) => {
+					let token = res.data.token;
+					if (token) {
+						sessionStorage['token'] = token;
+					}
+				}).catch((err) => {
+					this.onSignOut()
+				});
+			}
+		}, 3*60*1000); // every 3 minute
+
+	}
 }
 </script>

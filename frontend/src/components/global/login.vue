@@ -124,7 +124,7 @@ export default {
         },
         RegisterRequest(evt) {
             evt.preventDefault();
-            this.$http.put('auth/register', {
+            this.$http.post('auth/register', {
                 id: this.register.id,
                 password: this.register.password,
                 name: this.register.name,

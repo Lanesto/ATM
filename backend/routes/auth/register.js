@@ -18,8 +18,7 @@ module.exports = function(req, res, next) {
                 throw 'DatabaseError';
             }
             else {
-                var complete = result.rowsAffected;
-                if (complete) {
+                if (result.rowsAffected) {
                     res.status(201).send({ message: 'Registration Completed' });
                 }
             }

@@ -6,16 +6,15 @@ module.exports = function(req, res, next) {
     console.log(`auth/refresh: incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {
         let decoded = jwt.verify(token, jwtConfig.secret);
-        if (decoded) {
-            res.json({
-                token: jwt.sign({ // recreate token and send it
-                    UserID: decoded.UserID,
-                    UserName: decoded.UserName
-                }, jwtConfig.secret, jwtConfig.options)
-            })
-        } else throw 'InvalidTokenError';
+        if (!decoded) throw 'InvalidTokenError';
+        res.json({
+            token: jwt.sign({ // recreate token and send it
+                UserID: decoded.UserID,
+                UserName: decoded.UserName
+            }, jwtConfig.secret, jwtConfig.options)
+        });
     } catch(e) {
-        if (e == 'InvalidTokenError') {
+        if (e == 'InvalidTokenError' || e.name == 'TokenExpiredError' || e.name == 'JsonWebTokenError') {
             res.status(401).send({ message: 'Expired or Invalid Token' });
             console.log('auth/refresh: refresh failure, invalid token');
         } else {

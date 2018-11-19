@@ -2,8 +2,11 @@ var oracledb = require('../../db/oracledb');
 
 // Add TrailerURL
 module.exports = function(req, res, next) {
-    q = req.query;
+    var q = req.query;
     q.search = q.search || '';
+    // from
+    // to
+    // search
     oracledb.bind("\
         SELECT MovieID, \
         MovieTitle, \
@@ -30,8 +33,8 @@ module.exports = function(req, res, next) {
     ], function(err, result) {
         if (err) console.log(err);
         else {
-            arr = [];
-            rows = result.rows;
+            var arr = [];
+            var rows = result.rows;
             for (var i in rows) {
                 row = rows[i];
                 let obj = {
@@ -49,7 +52,7 @@ module.exports = function(req, res, next) {
                 arr.push(obj);
             }
             console.log(`api/movie: fetched ${arr.length} row(s)`);
-            res.json(arr);
+            res.status(200).json(arr);
         }
     });
 };

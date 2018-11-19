@@ -41,6 +41,15 @@ export default {
         },
         hideModal () {
             this.$refs.modalRef.hide()
+        },
+        addComment() {
+
+        },
+        deleteComment() {
+
+        },
+        bringComments() {
+
         }
     }
 }
