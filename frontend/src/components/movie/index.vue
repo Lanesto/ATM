@@ -1,6 +1,6 @@
 <template>
     <b-container fluid>
-        <b-card-group>
+        <b-card-group deck>
             <movie-info v-bind="movie" v-for="movie in movies" :key="movie.MovieID"/>
         </b-card-group>
         <b-button class="my-2" 

@@ -10,16 +10,16 @@
             </b-navbar-nav>
             <b-navbar-nav class="ml-auto">
                 <b-nav-form @submit="searchMovie">
-                    <b-form-input type="text" class="ml-sm-3 mr-sm-1"
+                    <b-form-input type="text" class="ml-sm-3" style="width:70%"
                                   size="sm" placeholder="Search Movie"
                                   v-model="searchOption"/>
-                    <b-button type="submit" class="mt-1 mt-sm-0" 
+                    <b-button type="submit" class="ml-1 mt-sm-0"
                               size="sm">GO</b-button>
                 </b-nav-form>
                 <b-nav-item-dropdown class="ml-sm-3" 
                                      right :text="userId">
-                    <b-dropdown-item :to="{ name: 'account' }">{{ userName }}</b-dropdown-item>
-                    <b-dropdown-item v-if="!loggedOn" @click="showModal" >Sign In</b-dropdown-item>
+                    <b-dropdown-item :disabled="!loggedOn" :to="{ name: 'account' }">{{ userName }}</b-dropdown-item>
+                    <b-dropdown-item v-if="!loggedOn" @click="showModal">Sign In</b-dropdown-item>
                     <b-dropdown-item v-if="loggedOn" 
                                      replace :to="{ name: 'home'}"
                                      @click="signOut">Sign Out</b-dropdown-item>

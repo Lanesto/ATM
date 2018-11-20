@@ -96,10 +96,10 @@ router.post('/', function(req, res, next) {
     }
 });
 
-router.delete('/', function(req, res, next) {
+router.delete('/:id', function(req, res, next) {
     // Delete a comment
     let token = (req.get('Authorization')).split(' ')[1];
-    var b = req.body;
+    var p = req.params;
     // commentID: the comment to delete
     console.log(`api/comment(delete): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {
@@ -108,20 +108,24 @@ router.delete('/', function(req, res, next) {
         oracledb.bind("\
         DELETE FROM Comments \
         WHERE CommentID = :0 AND CustomerID = :1", [
-            b.commentID,
+            p.id,
             decoded.UserID
         ], function(err, result) {
             try {
+                console.log(`try: ${p.id}, ${decoded.UserID}`)
                 if (err) {
                     console.log(err);
                     throw 'DatabaseError';
                 } else if (result.rowsAffected) {
                     res.status(200).send({ message: 'Deleted a comment successfully' });
-                } else throw 'DatabaseError';
+                } else throw 'HaveNoRightsError';
             } catch(e) {
                 if (e == 'DatabaseError') {
                     res.status(500).send({ message: 'Server Database Error' });
                     console.log('api/comment(delete): server database error');
+                } else if (e == 'HaveNoRightsError') {
+                    res.status(401).send({ message: 'You Cannot Delete This Comment' });
+                    console.log('api/comment(delete): insufficient right error')
                 }
             }
         });

@@ -52,8 +52,6 @@ router.post('/', function(req, res, next) {
 router.post('/reservation', function(req, res, next) {
     let token = (req.get('Authorization')).split(' ')[1];
     var b = req.body;
-    // from
-    // to
     console.log('verify:' + b.from, b.to);
     console.log(`auth/account/reservation(post): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {
@@ -91,11 +89,8 @@ router.post('/reservation', function(req, res, next) {
                 WHERE rs.CustomerID = :0 \
                 ORDER BY rs.ReservedDate DESC \
             ) Q \
-        ) \
-        WHERE N BETWEEN :1 AND :2", [
+        )", [
             decoded.UserID,
-            parseInt(b.from, 10),
-            parseInt(b.to, 10)
         ], function(err, result) {
             if (err) console.log(err);
             else {
