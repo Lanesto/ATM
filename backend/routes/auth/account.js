@@ -65,8 +65,7 @@ router.post('/reservation', function(req, res, next) {
         ReservedSeats, \
         TO_CHAR(ReservedDate, 'YYYY-MM-DD'), \
         RoomName, \
-        RowNo, \
-        ColumnNo, \
+        WM_CONCAT(CONCAT(RowNo, ColumnNo)), \
         TO_CHAR(PlayDate, 'YYYY-MM-DD HH24:MI')\
         FROM ( \
             SELECT Q.*, ROWNUM N \
@@ -89,7 +88,8 @@ router.post('/reservation', function(req, res, next) {
                 WHERE rs.CustomerID = :0 \
                 ORDER BY rs.ReservedDate DESC \
             ) Q \
-        )", [
+        ) \
+        GROUP BY ReservationID, TotalPrice, AdultTicketCount, YouthTicketCount, ReservedSeats, ReservedDate, RoomName, PlayDate", [
             decoded.UserID,
         ], function(err, result) {
             if (err) console.log(err);
@@ -106,8 +106,7 @@ router.post('/reservation', function(req, res, next) {
                         ReservedSeats: '',
                         ReservedDate: '', 
                         RoomName: '',
-                        RowNo: '',
-                        ColumnNo: '',
+                        Seats: '',
                         PlayDate: ''
                     }
                     for (i in obj) obj[i] = row.shift();

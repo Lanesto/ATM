@@ -7,9 +7,7 @@
                 :img-src="this.PosterIMG"
                 :title="this.MovieTitle"
                 @click="showModal">
-            <p class="card-text">
-                A Movie!
-            </p>
+            <b-badge variant="info">{{ Genre }}</b-badge>
         </b-card>
         <b-modal ref="modalRef" 
                  size="lg" lazy hide-header hide-footer>
@@ -89,7 +87,7 @@ export default {
     methods: {
         showModal() { 
             this.$refs.modalRef.show(); 
-            this.BringComments();
+            if (this.comments.length == 0) this.BringComments();
         },
         hideModal() { this.$refs.modalRef.hide(); },
         AddComment(evt) {

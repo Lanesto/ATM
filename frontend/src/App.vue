@@ -7,11 +7,10 @@
 							@showLoginModal="showModal"
 							@signOut="onSignOut"/>
 		<router-view :key="$route.fullPath"/>
-		<app-footer/>
-		<!-- modals are not seen by default -->
         <app-login :show="LMVisible" 
 				@hideModal="hideModal" 
 				@login="onLoginSuccess"/>
+		<app-footer/>
 	</div>
 </template>
 

@@ -12,6 +12,7 @@ router.get('/', function(req, res, next) {
     // date Format(YYYY-MM-DD)
     oracledb.bind("\
     SELECT ScheduleID, \
+    RoomID, \
     RoomName, \
     TO_CHAR(PlayDate, 'HH24:MI'), \
     Price, \
@@ -35,6 +36,7 @@ router.get('/', function(req, res, next) {
                 row = rows[i];
                 let obj = {
                     ScheduleID: -1,
+                    RoomID: -1,
                     RoomName: '',
                     PlayDate: '',
                     Price: '',
