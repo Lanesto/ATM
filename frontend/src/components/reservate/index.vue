@@ -1,5 +1,5 @@
 <template>
-	<b-container>
+	<b-container fluid>
 		<b-row class="mt-3 mb-1">
 			<b-col cols="4">
 				<strong>Movie</strong>
@@ -19,8 +19,8 @@
 			</b-col>
 			<b-col cols="4">
 				<strong>Schedule</strong>
-				<b-form-select v-model="resForm.scheduleID" class="mb-3" :select-size="10">
-					<option :value="schedule.ScheduleID" v-for="schedule in schedules" :key="schedule.ScheduleID">
+				<b-form-select v-model="curSch" class="mb-3" :select-size="10">
+					<option :value="schedule" v-for="schedule in schedules" :key="schedule.ScheduleID">
 						{{ schedule.RoomName }}, {{ schedule.PlayDate }}
 					</option>
 				</b-form-select>
@@ -31,10 +31,34 @@
 				<strong>Play At</strong>
 				<b-form-input type="date" v-model="schForm.date" @input="bringSchedules"/>
 			</b-col>
-			<b-col cols="4">
-				<strong>Number of youth</strong>
-				<b-form-input type="number" min="0" max="10" step="1" v-model="resForm.youthNum"/>
+			<b-col cols="2">
+				<strong>Youth</strong>
+				<b-form-input type="number" min="0" :max="resForm.selectedSeats.length - resForm.adultNum" step="1" v-model="resForm.youthNum"
+							@input="resForm.adultNum = resForm.selectedSeats.length - resForm.youthNum"/>
 			</b-col>
+			<b-col cols="2">
+				<strong>Adult</strong>
+				<b-form-input type="number" min="0" :max="resForm.selectedSeats.length - resForm.youthNum" step="1" v-model="resForm.adultNum"
+							@input="resForm.youthNum = resForm.selectedSeats.length - resForm.adultNum"/>
+			</b-col>
+		</b-row>
+		<b-row class="mb-4">
+			<b-col cols="12">
+				<strong>Select Seats</strong>
+				<h2 class="ml-3 my-4" v-if="Object.keys(curSch).length === 0 && curSch.constructor === Object">
+					There's no schedules available for this prerequisites.
+				</h2>
+				<b-button-group v-else class="d-block" vertical>
+					<b-button-group size="sm" v-for="row in curSch.RowMax" :key="row">
+						<b-button :disabled="(curSch.SeatsUnavailable || []).indexOf(seatConv(row, col)) > -1" 
+							v-for="col in curSch.ColumnMax" :key="col"
+							:pressed="resForm.selectedSeats.indexOf(seatConv(row, col)) > -1" @click="seatsToggle(row, col)">{{ seatConv(row, col) }}</b-button>
+					</b-button-group>
+				</b-button-group>
+			</b-col>
+		</b-row>
+		<b-row>
+			<b-button class="my-1 mb-2" block @click="reservate">Reservate</b-button>
 		</b-row>
 	</b-container>
 </template>
@@ -46,15 +70,15 @@ export default {
 			cinemas: [],
 			movies: [],
 			schedules: [],
+			curSch: {},
 			schForm: {
 				movieID: -1,
 				cinemaID: -1,
 				date: '',
 			},
 			resForm: {
-				roomID: -1,
-				scheduleID: -1,
 				youthNum: 0,
+				adultNum: 0,
 				selectedSeats: []
 			}
 		}
@@ -75,6 +99,22 @@ export default {
 
 	},
 	methods: {
+		seatConv(row, col) {
+			return `${String.fromCharCode(65 + row - 1)}${col}`;
+		},
+		seatsToggle(row, col) {
+			var index = this.resForm.selectedSeats.indexOf(this.seatConv(row, col));
+			if (index > -1) {
+				this.resForm.selectedSeats.splice(index, 1);
+				if (this.resForm.adultNum > 0) this.resForm.adultNum--;
+				else this.resForm.youthNum--;
+			} else if (this.resForm.selectedSeats.length < 10) {
+				this.resForm.selectedSeats.push(this.seatConv(row, col));
+				this.resForm.adultNum = this.resForm.selectedSeats.length - this.resForm.youthNum;
+			} else {
+				alert('Cannot reserve more than 10 seats');
+			}
+		},
 		bringSchedules() {
             this.$http.get('api/reservate', {
                 params: {
@@ -83,24 +123,37 @@ export default {
 					date: this.schForm.date
                 }
             }).then((res) => {
+				if (res.data.length == 0)
+					this.curSch = {};
+
 				this.schedules = res.data;
             });
 		},
 		reservate() {
+			var seatProc = [];
+			for (var x of this.resForm.selectedSeats) {
+				let obj = {
+					rowNo: x[0],
+					columnNo: x.slice(1)
+				}
+				seatProc.push(obj);
+			}
+			
             this.$http.post('api/reservate', {
 				cinemaID: this.schForm.cinemaID,
-				roomID: this.schForm.roomID,
-				scheduleID: this.schForm.scheduleID,
-				youthNum: this.schForm.youthNum,
-				selectedSeats: this.schForm.seats,
+				roomID: this.curSch.RoomID,
+				scheduleID: this.curSch.ScheduleID,
+				youthNum: this.resForm.youthNum,
+				selectedSeats: seatProc
 			}, {
 				headers: {
 					'Authorization': `Bearer ${sessionStorage['token']}`
 				}
             }).then((res) => {
-
+				alert('Reservated successfully');
+				this.$router.push({ name: 'account' });
 			}).catch((err) => {
-
+				alert(err.response.data.message || err.message);
 			})
 		},
 	}

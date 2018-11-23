@@ -11,19 +11,23 @@ router.get('/', function(req, res, next) {
     // cinemaID
     // date Format(YYYY-MM-DD)
     oracledb.bind("\
-    SELECT ScheduleID, \
-    RoomID, \
-    RoomName, \
-    TO_CHAR(PlayDate, 'HH24:MI'), \
-    Price, \
-    YouthPrice\
+    SELECT sc.ScheduleID, \
+    r.RoomID, \
+    r.RoomName, \
+    r.RowMax, \
+    r.ColumnMax, \
+    TO_CHAR(sc.PlayDate, 'HH24:MI'), \
+    sc.Price, \
+    sc.YouthPrice, \
+    WM_CONCAT(CONCAT(st.RowNo, st.ColumnNo)) \
     FROM Schedules sc \
     JOIN MovieSchedule m_s ON sc.ScheduleID = m_s.ScheduleID \
     JOIN Movies m ON m.MovieID = m_s.MovieID \
     JOIN RoomSchedule r_s ON sc.ScheduleID = r_s.ScheduleID \
     JOIN Rooms r ON r.RoomID = r_s.RoomID \
-    WHERE m.MovieID = :0 AND r.CinemaID = :1 \
-    AND TO_CHAR(sc.PlayDate, 'YYYY-MM-DD') = :2", [
+    LEFT JOIN Seats st ON sc.ScheduleID = st.ScheduleID \
+    WHERE m.MovieID = :0 AND r.CinemaID = :1 AND TO_CHAR(sc.PlayDate, 'YYYY-MM-DD') = :2 \
+    GROUP BY sc.ScheduleID, r.RoomID, r.RoomName, r.RowMax, r.ColumnMax, sc.PlayDate, sc.Price, sc.YouthPrice", [
         q.movieID,
         q.cinemaID,
         q.date
@@ -38,9 +42,12 @@ router.get('/', function(req, res, next) {
                     ScheduleID: -1,
                     RoomID: -1,
                     RoomName: '',
+                    RowMax: 0,
+                    ColumnMax: 0,
                     PlayDate: '',
                     Price: '',
                     YouthPrice: '',
+                    SeatsUnavailable: ''
                 };
                 for (i in obj) obj[i] = row.shift();
                 arr.push(obj);
@@ -58,7 +65,7 @@ router.post('/', function(req, res, next) {
     // roomID
     // scheduleID
     // youthNum
-    // selectedSeats [(row, col), ...]
+    // selectedSeats [(rowNo, columnNo), ...]
     console.log(`api/reservate(post): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {
         let decoded = jwt.verify(token, jwtConfig.secret);
@@ -109,9 +116,9 @@ router.post('/', function(req, res, next) {
 
 });
 
-router.delete('/', function(req, res, next) {
+router.delete('/:id', function(req, res, next) {
     let token = (req.get('Authorization')).split(' ')[1];
-    var b = req.body;
+    var p = req.params;
     // reservationID
     console.log(`api/reservate(delete): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {
@@ -120,7 +127,7 @@ router.delete('/', function(req, res, next) {
         oracledb.bind("\
         DELETE FROM Reservations \
         WHERE ReservationID = :0 AND CustomerID = :1", [
-            b.reservationID,
+            p.id,
             decoded.UserID
         ], function(err, result) {
             try {

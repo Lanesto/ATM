@@ -64,9 +64,11 @@ router.post('/reservation', function(req, res, next) {
         YouthTicketCount, \
         ReservedSeats, \
         TO_CHAR(ReservedDate, 'YYYY-MM-DD'), \
+        MovieTitle, \
+        CinemaName, \
         RoomName, \
         WM_CONCAT(CONCAT(RowNo, ColumnNo)), \
-        TO_CHAR(PlayDate, 'YYYY-MM-DD HH24:MI')\
+        TO_CHAR(PlayDate, 'YYYY-MM-DD HH24:MI') \
         FROM ( \
             SELECT Q.*, ROWNUM N \
             FROM ( \
@@ -77,6 +79,8 @@ router.post('/reservation', function(req, res, next) {
                     rs.YouthTicketCount, \
                     rs.ReservedSeats, \
                     rs.ReservedDate, \
+                    m.MovieTitle, \
+                    c.CinemaName, \
                     r.RoomName, \
                     s.RowNo, \
                     s.ColumnNo, \
@@ -84,12 +88,16 @@ router.post('/reservation', function(req, res, next) {
                 FROM Reservations rs \
                 JOIN Seats s ON rs.ReservationID = s.ReservationID \
                 JOIN Rooms r ON s.RoomID = r.RoomID \
+                JOIN RoomSchedule r_s ON r_s.RoomID = r.RoomID \
+                JOIN Cinemas c ON c.CinemaID = r.CinemaID \
                 JOIN Schedules sc ON sc.ScheduleID = rs.ScheduleID \
+                JOIN MovieSchedule m_s ON m_s.ScheduleID = sc.ScheduleID \
+                JOIN Movies m ON m.MovieID = m_s.MovieID \
                 WHERE rs.CustomerID = :0 \
                 ORDER BY rs.ReservedDate DESC \
             ) Q \
         ) \
-        GROUP BY ReservationID, TotalPrice, AdultTicketCount, YouthTicketCount, ReservedSeats, ReservedDate, RoomName, PlayDate", [
+        GROUP BY ReservationID, TotalPrice, AdultTicketCount, YouthTicketCount, ReservedSeats, ReservedDate, MovieTitle, CinemaName, RoomName, PlayDate", [
             decoded.UserID,
         ], function(err, result) {
             if (err) console.log(err);
@@ -105,6 +113,8 @@ router.post('/reservation', function(req, res, next) {
                         YouthTicketCount: '',
                         ReservedSeats: '',
                         ReservedDate: '', 
+                        MovieTitle: '',
+                        CinemaName: '',
                         RoomName: '',
                         Seats: '',
                         PlayDate: ''
