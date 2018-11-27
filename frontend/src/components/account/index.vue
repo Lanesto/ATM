@@ -93,64 +93,57 @@ export default {
 		}
 	},
 	created() { // for api communication test
-		this.bringPrivates();
-		this.bringReservations();
+		this.bringPrivates()
+		this.bringReservations()
 	},
 	methods: {
 		bringPrivates() {
-            this.$http.post('auth/account', {}, {
-				headers: {
-					'Authorization': `Bearer ${sessionStorage['token']}`
-				},
-            }).then((res) => {
-				this.privates = res.data;
-				if (this.privates.Gender == 'M') this.privates.Gender = 'Male';
-				else if (this.privates.Gender == 'F') this.privates.Gender = 'Female';
+			this.$http.post('auth/account', {})
+			.then((res) => {
+				this.privates = res.data
+				if (this.privates.Gender == 'M') this.privates.Gender = 'Male'
+				else if (this.privates.Gender == 'F') this.privates.Gender = 'Female'
             })
 		},
 		bringReservations() {
             this.$http.post('auth/account/reservation', {
 					from: this.loadPoint,
 					to: this.loadPoint + this.loadCount - 1
-				},{
-				headers: {
-					'Authorization': `Bearer ${sessionStorage['token']}`
-				}
 				}).then((res) => {
                 let data = res.data
                 if (data.length > 0) {
-					this.reservations.push(...data);
-					this.loadPoint += data.length;
+					this.reservations.push(...data)
+					this.loadPoint += data.length
                 }
                 if (data.length < this.loadCount || data.length <= 0) {
-                    this.isEnd = true;
+                    this.isEnd = true
 				}
             })
 		},
 		cancelReservation(item) {
-			var resID = item.ReservationID;
-			var answer = confirm(`Cancel reservation for ${resID}?`);
+			var resID = item.ReservationID
+			var answer = confirm(`Cancel reservation for ${resID}?`)
 			if (!answer) {
-				return;
+				return
 			}
             this.$http.delete(`api/reservate/${resID}`, {
                 headers: {
                     'Authorization': `Bearer ${sessionStorage['token']}`
                 }
             }).then((res) => {
-				this.reservations = this.reservations.filter(x => x.ReservationID != resID);
+				this.reservations = this.reservations.filter(x => x.ReservationID != resID)
             }).catch(err => {
-                var msg = '';
+                var msg = ''
                 if (err.response) { // Response Error
-                    var res = err.response;
-                    msg = res.data.message;
+                    var res = err.response
+                    msg = res.data.message
                 } else if (err.request) { // Server Error
-                    msg = err.message;
+                    msg = err.message
                 } else { // Request Error
-                    msg = err.message;
+                    msg = err.message
                 }
-                alert(msg);
-            });
+                alert(msg)
+            })
 		}
 	}
 }

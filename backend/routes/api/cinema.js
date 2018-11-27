@@ -1,6 +1,7 @@
 var oracledb = require('../../db/oracledb');
 
 module.exports = function(req, res, next) {
+    // return all cinema list
     oracledb.run("\
         SELECT CinemaID, \
         CinemaName, \

@@ -19,11 +19,11 @@ export default {
     },
     created() {
         window.onscroll = () => {
-            let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
+            let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
             if (bottomOfWindow) {
                 this.BringMovies()
             }
-        };
+        }
         this.BringMovies()
     },
     data() {
@@ -37,7 +37,7 @@ export default {
     },
     methods: {
         BringMovies() {
-            if (this.isEnd) return;
+            if (this.isEnd) return
             this.$http.get('api/movie', {
                 params: {
                     from: this.loadPoint,
@@ -48,11 +48,11 @@ export default {
                 let data = res.data
                 if (data.length > 0) {
                     this.movies.push(...data)
-                    this.loadPoint += data.length;
+                    this.loadPoint += data.length
                 }
                 if (data.length < this.loadCount || data.length <= 0) {
-                    this.isEnd = true;
-                    this.btnText = 'We brougth all the movies for you';
+                    this.isEnd = true
+                    this.btnText = 'We brougth all the movies for you'
                 }
             })
         }

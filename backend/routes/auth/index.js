@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/', function(req, res, next) {
-
+    // not used yet
 });
 
 router.post('/login', require('./login'));

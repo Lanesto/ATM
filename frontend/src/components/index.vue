@@ -30,8 +30,8 @@ export default {
 		})
 	},
 	methods: {
-		onSlideStart() { this.sliding = true; },
-		onSlideEnd() { this.sliding = false; }
+		onSlideStart() { this.sliding = true },
+		onSlideEnd() { this.sliding = false }
 	}
 }
 </script>

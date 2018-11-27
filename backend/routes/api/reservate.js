@@ -6,7 +6,7 @@ var jwtConfig = require('../../secrets/jwt_config');
 
 router.get('/', function(req, res, next) {
     // Return available schedules
-    var q = req.query;
+    let q = req.query;
     // movieID
     // cinemaID
     // date Format(YYYY-MM-DD)
@@ -34,9 +34,9 @@ router.get('/', function(req, res, next) {
     ], function(err, result) {
         if (err) console.log(err);
         else {
-            var arr = [];
-            var rows = result.rows;
-            for (var i in rows) {
+            let arr = [];
+            let rows = result.rows;
+            for (let i in rows) {
                 row = rows[i];
                 let obj = {
                     ScheduleID: -1,
@@ -49,7 +49,7 @@ router.get('/', function(req, res, next) {
                     YouthPrice: '',
                     SeatsUnavailable: ''
                 };
-                for (i in obj) obj[i] = row.shift();
+                for (let j in obj) obj[j] = row.shift();
                 arr.push(obj);
             }
             console.log(`api/reservate(get): fetched ${arr.length} row(s)`);
@@ -60,7 +60,7 @@ router.get('/', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
     let token = (req.get('Authorization')).split(' ')[1];
-    var b = req.body;
+    let b = req.body;
     // cinemaID
     // roomID
     // scheduleID
@@ -70,9 +70,9 @@ router.post('/', function(req, res, next) {
     try {
         let decoded = jwt.verify(token, jwtConfig.secret);
         if (!decoded) throw 'InvalidTokenError';
-        var seats_info = '';
-        for (var i in b.selectedSeats) {
-            var seat = b.selectedSeats[i];
+        let seats_info = '';
+        for (let i in b.selectedSeats) {
+            let seat = b.selectedSeats[i];
             seats_info += `
                 seats_info(${i})('RowNo') := '${seat.rowNo}';
                 seats_info(${i})('ColumnNo') := '${seat.columnNo}';`
@@ -118,7 +118,7 @@ router.post('/', function(req, res, next) {
 
 router.delete('/:id', function(req, res, next) {
     let token = (req.get('Authorization')).split(' ')[1];
-    var p = req.params;
+    let p = req.params;
     // reservationID
     console.log(`api/reservate(delete): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {

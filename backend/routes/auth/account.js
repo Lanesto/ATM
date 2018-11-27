@@ -24,7 +24,7 @@ router.post('/', function(req, res, next) {
         ], function(err, result) {
             if (err) console.log(err);
             else {
-                var row = result.rows[0];
+                let row = result.rows[0];
                 let obj = {
                     CustomerID: '',
                     CustomerName: '',
@@ -34,7 +34,7 @@ router.post('/', function(req, res, next) {
                     Address: '', 
                     Email: '',
                 }
-                for (i in obj) obj[i] = row.shift();
+                for (let i in obj) obj[i] = row.shift();
                 res.json(obj);
             }       
         });
@@ -51,7 +51,7 @@ router.post('/', function(req, res, next) {
 
 router.post('/reservation', function(req, res, next) {
     let token = (req.get('Authorization')).split(' ')[1];
-    var b = req.body;
+    let b = req.body;
     console.log('verify:' + b.from, b.to);
     console.log(`auth/account/reservation(post): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {
@@ -102,9 +102,9 @@ router.post('/reservation', function(req, res, next) {
         ], function(err, result) {
             if (err) console.log(err);
             else {
-                var arr = [];
-                var rows = result.rows;
-                for (var i in rows) {
+                let arr = [];
+                let rows = result.rows;
+                for (let i in rows) {
                     row = rows[i];
                     let obj = {
                         ReservationID: -1,
@@ -119,7 +119,7 @@ router.post('/reservation', function(req, res, next) {
                         Seats: '',
                         PlayDate: ''
                     }
-                    for (i in obj) obj[i] = row.shift();
+                    for (let j in obj) obj[j] = row.shift();
                     arr.push(obj);
                 }
                 console.log(`auth/account/reservation(post): fetched ${arr.length} row(s)`);

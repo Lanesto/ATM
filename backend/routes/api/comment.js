@@ -32,9 +32,9 @@ router.get('/', function(req, res, next) {
     ], function(err, result) {
         if (err) console.log(err);
         else {
-            var arr = [];
-            var rows = result.rows;
-            for (var i in rows) {
+            let arr = [];
+            let rows = result.rows;
+            for (let i in rows) {
                 row = rows[i];
                 let obj = {
                     CommentID: -1,
@@ -43,7 +43,7 @@ router.get('/', function(req, res, next) {
                     PostDate: '',
                     CustomerID: '',
                 }
-                for (i in obj) obj[i] = row.shift();
+                for (let j in obj) obj[j] = row.shift();
                 arr.push(obj);
             }
             console.log(`api/comment(get): fetched ${arr.length} row(s)`);
@@ -55,10 +55,10 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
     // Add new comment on specific movie
     let token = (req.get('Authorization')).split(' ')[1];
-    var b = req.body;
-    // movieID: where it sticks to
-    // rate: evaluated point on movie
-    // content: comment itself
+    let b = req.body;
+    // movieID
+    // rate
+    // content
     console.log(`api/comment(post): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {
         let decoded = jwt.verify(token, jwtConfig.secret);
@@ -99,7 +99,7 @@ router.post('/', function(req, res, next) {
 router.delete('/:id', function(req, res, next) {
     // Delete a comment
     let token = (req.get('Authorization')).split(' ')[1];
-    var p = req.params;
+    let p = req.params;
     // commentID: the comment to delete
     console.log(`api/comment(delete): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {
@@ -125,7 +125,7 @@ router.delete('/:id', function(req, res, next) {
                     console.log('api/comment(delete): server database error');
                 } else if (e == 'HaveNoRightsError') {
                     res.status(401).send({ message: 'You Cannot Delete This Comment' });
-                    console.log('api/comment(delete): insufficient right error')
+                    console.log('api/comment(delete): insufficient right error');
                 }
             }
         });
@@ -134,7 +134,7 @@ router.delete('/:id', function(req, res, next) {
             res.status(401).send({ message: 'Expired or Invalid Token' });
             console.log('api/comment(delete): deleting a comment failed, invalid token');
         } else {
-            res.status(500).send({ message: 'Internal Server Error' })
+            res.status(500).send({ message: 'Internal Server Error' });
             console.log(e);
         }
     }

@@ -86,33 +86,33 @@ export default {
 	created() {
 		this.$http.get('api/cinema', {})
 		.then((res) => {
-			this.cinemas = res.data;
-		});
+			this.cinemas = res.data
+		})
 		this.$http.get('api/movie', {
 			params: {
 				from: 1,
 				to: 100
 			}
 		}).then((res) => {
-			this.movies = res.data;
-		});
+			this.movies = res.data
+		})
 
 	},
 	methods: {
 		seatConv(row, col) {
-			return `${String.fromCharCode(65 + row - 1)}${col}`;
+			return `${String.fromCharCode(65 + row - 1)}${col}`
 		},
 		seatsToggle(row, col) {
-			var index = this.resForm.selectedSeats.indexOf(this.seatConv(row, col));
+			var index = this.resForm.selectedSeats.indexOf(this.seatConv(row, col))
 			if (index > -1) {
-				this.resForm.selectedSeats.splice(index, 1);
-				if (this.resForm.adultNum > 0) this.resForm.adultNum--;
-				else this.resForm.youthNum--;
+				this.resForm.selectedSeats.splice(index, 1)
+				if (this.resForm.adultNum > 0) this.resForm.adultNum--
+				else this.resForm.youthNum--
 			} else if (this.resForm.selectedSeats.length < 10) {
-				this.resForm.selectedSeats.push(this.seatConv(row, col));
-				this.resForm.adultNum = this.resForm.selectedSeats.length - this.resForm.youthNum;
+				this.resForm.selectedSeats.push(this.seatConv(row, col))
+				this.resForm.adultNum = this.resForm.selectedSeats.length - this.resForm.youthNum
 			} else {
-				alert('Cannot reserve more than 10 seats');
+				alert('Cannot reserve more than 10 seats')
 			}
 		},
 		bringSchedules() {
@@ -124,19 +124,19 @@ export default {
                 }
             }).then((res) => {
 				if (res.data.length == 0)
-					this.curSch = {};
+					this.curSch = {}
 
-				this.schedules = res.data;
-            });
+				this.schedules = res.data
+            })
 		},
 		reservate() {
-			var seatProc = [];
+			var seatProc = []
 			for (var x of this.resForm.selectedSeats) {
 				let obj = {
 					rowNo: x[0],
 					columnNo: x.slice(1)
 				}
-				seatProc.push(obj);
+				seatProc.push(obj)
 			}
 			
             this.$http.post('api/reservate', {
@@ -150,10 +150,10 @@ export default {
 					'Authorization': `Bearer ${sessionStorage['token']}`
 				}
             }).then((res) => {
-				alert('Reservated successfully');
-				this.$router.push({ name: 'account' });
+				alert('Reservated successfully')
+				this.$router.push({ name: 'account' })
 			}).catch((err) => {
-				alert(err.response.data.message || err.message);
+				alert(err.response.data.message || err.message)
 			})
 		},
 	}

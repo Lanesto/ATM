@@ -1,6 +1,7 @@
 var oracledb = require('../../db/oracledb');
 
 module.exports = function(req, res, next) {
+    // Create new account
     var b = req.body;
     console.log(`auth/register: incoming new registration`);
     oracledb.bind("\

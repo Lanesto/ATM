@@ -1,8 +1,8 @@
 var oracledb = require('../../db/oracledb');
 
-// Add TrailerURL
 module.exports = function(req, res, next) {
-    var q = req.query;
+    // Return movie informations
+    let q = req.query;
     q.search = q.search || '';
     // from
     // to
@@ -33,9 +33,9 @@ module.exports = function(req, res, next) {
     ], function(err, result) {
         if (err) console.log(err);
         else {
-            var arr = [];
-            var rows = result.rows;
-            for (var i in rows) {
+            let arr = [];
+            let rows = result.rows;
+            for (let i in rows) {
                 row = rows[i];
                 let obj = {
                     MovieID: -1,
@@ -48,7 +48,7 @@ module.exports = function(req, res, next) {
                     Description: '',
                     PosterIMG: '',
                 }
-                for (i in obj) obj[i] = row.shift();
+                for (let j in obj) obj[j] = row.shift();
                 arr.push(obj);
             }
             console.log(`api/movie: fetched ${arr.length} row(s)`);

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-card class="mx-1 my-1" style="max-width:14rem;"
+        <b-card class="mx-1 my-1" style="max-width:14rem"
                 img-top 
                 img-alt="Image"
                 img-fluid
@@ -14,7 +14,7 @@
             <b-container>
                 <b-img class="mt-3" 
                         fluid thumbnail :src="this.PosterIMG"/>
-                <h1 class="mx-2 mt-2 mb-3" style="display:inline-block;">{{ MovieTitle }}</h1><b-badge variant="info">{{ Genre }}</b-badge>
+                <h1 class="mx-2 mt-2 mb-3" style="display:inline-block">{{ MovieTitle }}</h1><b-badge variant="info">{{ Genre }}</b-badge>
                 <p class="my-1"><strong>PlayTime:</strong> {{ PlayTime }}</p>
                 <p class="my-1"><strong>Released Date:</strong> {{ ReleaseDate }}</p>
                 <p class="my-1"><strong>Director:</strong> {{ Director }}</p>
@@ -31,7 +31,7 @@
                             <b-button class="float-right" 
                                     size="sm" variant="light"
                                     @click="DeleteComment(comment.CommentID)">&times;</b-button>
-                            <p class="ml-2 my-1" style="text-overflow:clip;">{{ comment.Content }}</p>
+                            <p class="ml-2 my-1" style="text-overflow:clip">{{ comment.Content }}</p>
                         </b-card>
                     </b-card-group>
                     <b-button class="mb-2" 
@@ -41,7 +41,7 @@
                         <b-form-textarea id="textarea1"
                                             no-resize :rows="3" :max-rows="5"
                                             v-model="commentContent"/>
-                        <b-input-group class="mt-2" prepend="&bigstar;">
+                        <b-input-group class="mt-2" prepend="&bigstar">
                             <b-form-select v-model="commentRate">
                                 <option v-for="n in 6" :key="n" :value="2 * (n - 1)">{{ '★'.repeat(n - 1) + '☆'.repeat(6 - n)}}</option>
                             </b-form-select>
@@ -82,16 +82,16 @@ export default {
         }
     },
     computed: {
-        CommentFeedback() { return this.errMsg ? true : false; }
+        CommentFeedback() { return this.errMsg ? true : false }
     },
     methods: {
         showModal() { 
-            this.$refs.modalRef.show(); 
-            if (this.comments.length == 0) this.BringComments();
+            this.$refs.modalRef.show() 
+            if (this.comments.length == 0) this.BringComments()
         },
-        hideModal() { this.$refs.modalRef.hide(); },
+        hideModal() { this.$refs.modalRef.hide() },
         AddComment(evt) {
-            evt.preventDefault();
+            evt.preventDefault()
             this.$http.post('api/comment', {
                 movieID: this.MovieID,
                 rate: this.commentRate,
@@ -103,25 +103,25 @@ export default {
             }).then((res) => {
                 this.ReloadComments()
             }).catch(err => {
-                var msg = '';
+                var msg = ''
                 if (err.response) { // Response Error
-                    var res = err.response;
-                    msg = res.data.message;
+                    var res = err.response
+                    msg = res.data.message
                 } else if (err.request) { // Server Error
-                    msg = err.message;
+                    msg = err.message
                 } else { // Request Error
-                    msg = err.message;
+                    msg = err.message
                 }
-                alert(msg);
-            });
+                alert(msg)
+            })
 
         },
         ReloadComments() {
-            this.comments = [];
-            this.loadPoint = 1;
-            this.loadCount = 10;
-            this.isEnd = false;
-            this.BringComments();
+            this.comments = []
+            this.loadPoint = 1
+            this.loadCount = 10
+            this.isEnd = false
+            this.BringComments()
         },
         DeleteComment(commentID) {
             this.$http.delete(`api/comment/${commentID}`, {
@@ -129,22 +129,22 @@ export default {
                     'Authorization': `Bearer ${sessionStorage['token']}`
                 }
             }).then((res) => {
-                this.ReloadComments();
+                this.ReloadComments()
             }).catch(err => {
-                var msg = '';
+                var msg = ''
                 if (err.response) { // Response Error
-                    var res = err.response;
-                    msg = res.data.message;
+                    var res = err.response
+                    msg = res.data.message
                 } else if (err.request) { // Server Error
-                    msg = err.message;
+                    msg = err.message
                 } else { // Request Error
-                    msg = err.message;
+                    msg = err.message
                 }
-                alert(msg);
-            });
+                alert(msg)
+            })
         },
         BringComments() {
-            if (this.isEnd) return;
+            if (this.isEnd) return
             this.$http.get('api/comment', {
                 params: {
                     movieID: this.MovieID,
@@ -155,10 +155,10 @@ export default {
                 let data = res.data
                 if (data.length > 0) {
                     this.comments.push(...data)
-                    this.loadPoint += data.length;
+                    this.loadPoint += data.length
                 }
                 if (data.length < this.loadCount || data.length <= 0) {
-                    this.isEnd = true;
+                    this.isEnd = true
                 }
             })
         }
