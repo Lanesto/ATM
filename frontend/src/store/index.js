@@ -12,7 +12,6 @@ const store = new Vuex.Store({
         userID: 'Guest',
         userName: 'Anonymous',
         logonStatus: false,
-        showModal: false
     },
     getters: {
         userInfo(state) {
@@ -22,20 +21,18 @@ const store = new Vuex.Store({
                 logonStatus: state.logonStatus
             }
         },
-        isModalVisible(state) {
-            return state.showModal
-        }
     },
     mutations: {
-        LOGIN (state, {accessToken, UserID, UserName}) {
+        LOGIN (state, {accessToken, userID, userName}) {
             state.accessToken = accessToken
-            state.userID = UserID
-            state.userName = UserName
+            state.userID = userID
+            state.userName = userName
             state.logonStatus = true
+            axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
             localStorage.sessionData = JSON.stringify({
                 accessToken: accessToken,
-                userID: UserID,
-                userName: UserName
+                userID: userID,
+                userName: userName
             })
         },
         LOGOUT (state) {
@@ -43,40 +40,37 @@ const store = new Vuex.Store({
             state.userID = 'Guest'
             state.userName = 'Anonymous'
             state.logonStatus = false
+            axios.defaults.headers.common['Authorization'] = undefined
             delete localStorage.sessionData
         },
-        SHOW (state) {
-            state.showModal = true
-        },
-        HIDE (state) {
-            state.showModal = false
-        }
     },
     actions: {
         LOGIN ({commit}, {id, password}) {
             return axios.post('auth/login', {id, password})
             .then(({data}) => {
                 commit('LOGIN', data)
-                axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.sessionData.accessToken}`
             })
         },
         LOGOUT ({commit}) {
-            axios.defaults.headers.common['Authorization'] = undefined
             commit('LOGOUT')
         },
+        REFRESH ({commit}) {
+            return axios.post('auth/refresh')
+            .then(({data}) => { commit('LOGIN', data) })
+            .catch(err => { commit('LOGOUT') })
+        }
     }
 })
 
 const loadAccessToken = () => {
     try {
         const sessionData = JSON.parse(localStorage.sessionData)
-        if (!sessionData.accesstoken) 
+        if (!sessionData.accessToken)
             return
         
-///////////////////////////////////////////////////// Make action, and axios refresh to auth/refresh
-/// and make that api to return as auth/login
-        axios.defaults.headers.common['Authorization'] = `Bearer ${sessionData.accessToken}`
-    } catch(e) { console.log(e) }
+        store.commit('LOGIN', sessionData) // loads data from local storage
+        store.dispatch('REFRESH') // and validate it from server
+    } catch(e) { /* ignored */ }
 }
 loadAccessToken()
 

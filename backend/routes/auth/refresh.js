@@ -9,8 +9,11 @@ module.exports = function(req, res, next) {
         let decoded = jwt.verify(token, jwtConfig.secret);
         if (!decoded) throw 'InvalidTokenError';
         res.json({
-            token: jwt.sign({ // Recreate token and send it
-                ...decoded
+            userID: decoded.userID,
+            userName: decoded.userName,
+            accessToken: jwt.sign({
+                userID: decoded.userID,
+                userName: decoded.userName
             }, jwtConfig.secret, jwtConfig.options)
         });
     } catch(e) {

@@ -17,7 +17,7 @@
 					</b-card>
 				</b-col>
 			</b-row>
-			<b-row class="mt-2">
+			<b-row class="mt-2 px-3">
 				<b-table v-if="reservations.length > 0" hover :items="reservations" :fields="fields"
 						@row-clicked="cancelReservation"/>
 				<h2 class="mx-3 my-3" v-else>You have no reservations.</h2>

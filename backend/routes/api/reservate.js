@@ -84,7 +84,7 @@ router.post('/', function(req, res, next) {
             seats_info
         +   "CUSTOM_PKG.NEW_RESERVATION_PRC(:0, :1, :2, :3, :4, seats_info); \
         END;", [
-            decoded.UserID,
+            decoded.userID,
             b.cinemaID,
             b.roomID,
             b.scheduleID,
@@ -128,7 +128,7 @@ router.delete('/:id', function(req, res, next) {
         DELETE FROM Reservations \
         WHERE ReservationID = :0 AND CustomerID = :1", [
             p.id,
-            decoded.UserID
+            decoded.userID
         ], function(err, result) {
             try {
                 if (err) {

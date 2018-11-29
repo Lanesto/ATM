@@ -1,9 +1,8 @@
 <template>
-    <b-modal ref="loginModal"
-            hide-header hide-footer size="sm" body-bg-variant="light"
-            v-model="isModalVisible" @hide="onHide">
+    <b-modal id="loginModal" hide-header hide-footer size="sm" body-bg-variant="light">
         <login-page v-if="page===0" @toRegister="page=1"/>
         <register-page v-else-if="page===1" @toLogin="page=0"/>
+        <!-- reserved v-condition space for future use -->
     </b-modal>
 </template>
 
@@ -21,15 +20,5 @@ export default {
             page: 0
         }
     },
-    computed: {
-        isModalVisible() {
-            return this.$store.getters.isModalVisible
-        }
-    },
-    methods: {
-        onHide() {
-            this.$store.commit('HIDE')
-        }
-    }
 }
 </script>

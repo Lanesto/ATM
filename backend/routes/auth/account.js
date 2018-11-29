@@ -20,7 +20,7 @@ router.post('/', function(req, res, next) {
         Email \
         FROM Customers \
         WHERE CustomerID = :0", [
-            decoded.UserID,
+            decoded.userID,
         ], function(err, result) {
             if (err) console.log(err);
             else {
@@ -52,7 +52,6 @@ router.post('/', function(req, res, next) {
 router.post('/reservation', function(req, res, next) {
     let token = (req.get('Authorization')).split(' ')[1];
     let b = req.body;
-    console.log('verify:' + b.from, b.to);
     console.log(`auth/account/reservation(post): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {
         let decoded = jwt.verify(token, jwtConfig.secret);
@@ -98,7 +97,7 @@ router.post('/reservation', function(req, res, next) {
             ) Q \
         ) \
         GROUP BY ReservationID, TotalPrice, AdultTicketCount, YouthTicketCount, ReservedSeats, ReservedDate, MovieTitle, CinemaName, RoomName, PlayDate", [
-            decoded.UserID,
+            decoded.userID,
         ], function(err, result) {
             if (err) console.log(err);
             else {

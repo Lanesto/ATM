@@ -1,13 +1,16 @@
+// modules
 import Vue from 'vue'
 import Router from 'vue-router'
-
-Vue.use(Router)
-
-import NotFound from '@/components/NotFound'
+// components
+import NotFound from '@/components/not-found'
 import Home from '@/components/index'
 import Account from '@/components/account/index'
 import Movie from '@/components/movie/index'
 import Reservate from '@/components/reservate/index'
+// vuex store
+import store from '../store/index'
+
+Vue.use(Router)
 
 export default new Router({
 	mode: 'history',
@@ -17,7 +20,7 @@ export default new Router({
 			component: NotFound
 		},
 		{
-			path: '/home',
+			path: '/',
 			name: 'home',
 			component: Home
 		},
@@ -26,7 +29,8 @@ export default new Router({
 			name: 'account',
 			component: Account,
 			beforeEnter: (to, from, next) => {
-				if (localStorage.accessToken) next()
+				// user not logged in will be redirected to home page
+				if (store.getters.userInfo.logonStatus) next()
 				else next('/')
 			}
 		},

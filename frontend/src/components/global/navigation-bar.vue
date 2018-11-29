@@ -12,8 +12,7 @@
                     <b-form-input type="text" class="ml-sm-3" style="width:70%"
                                   size="sm" placeholder="Search Movie"
                                   v-model="searchOption"/>
-                    <b-button type="submit" class="ml-1 mt-sm-0"
-                              size="sm">GO</b-button>
+                    <b-button type="submit" class="ml-1 mt-sm-0" size="sm">GO</b-button>
                 </b-nav-form>
                 <b-nav-item-dropdown class="ml-sm-3" right :text="userInfo.userID">
                     <b-dropdown-item :disabled="!userInfo.logonStatus" :to="{ name: 'account' }">
@@ -44,10 +43,10 @@ export default {
             this.$router.push({ name: 'movie', query: { searchOption: this.searchOption }})
         },
         showModal() {
-            this.$store.commit('SHOW')
+            this.$root.$emit('bv::show::modal', 'loginModal')
         },
         onLogout() {
-            // Logout is implemented with programming methods,
+            // Logout is implemented with programming route methods,
             // becuz router-link(or :to prop) automatically adds class 'active' for button
             // and it makes some buttons alwasy highlighted
             this.$store.dispatch('LOGOUT')

@@ -34,12 +34,12 @@
 			<b-col cols="2">
 				<strong>Youth</strong>
 				<b-form-input type="number" min="0" :max="resForm.selectedSeats.length - resForm.adultNum" step="1" v-model="resForm.youthNum"
-							@input="resForm.adultNum = resForm.selectedSeats.length - resForm.youthNum"/>
+							  @input="resForm.adultNum = resForm.selectedSeats.length - resForm.youthNum"/>
 			</b-col>
 			<b-col cols="2">
 				<strong>Adult</strong>
 				<b-form-input type="number" min="0" :max="resForm.selectedSeats.length - resForm.youthNum" step="1" v-model="resForm.adultNum"
-							@input="resForm.youthNum = resForm.selectedSeats.length - resForm.adultNum"/>
+							  @input="resForm.youthNum = resForm.selectedSeats.length - resForm.adultNum"/>
 			</b-col>
 		</b-row>
 		<b-row class="mb-4">
@@ -50,9 +50,9 @@
 				</h2>
 				<b-button-group v-else class="d-block" vertical>
 					<b-button-group size="sm" v-for="row in curSch.RowMax" :key="row">
-						<b-button :disabled="(curSch.SeatsUnavailable || []).indexOf(seatConv(row, col)) > -1" 
-							v-for="col in curSch.ColumnMax" :key="col"
-							:pressed="resForm.selectedSeats.indexOf(seatConv(row, col)) > -1" @click="seatsToggle(row, col)">{{ seatConv(row, col) }}</b-button>
+						<b-button v-for="col in curSch.ColumnMax" :key="col"
+ 						   		 :disabled="(curSch.SeatsUnavailable || []).includes(seatConv(row, col))"
+ 								 :pressed="resForm.selectedSeats.includes(seatConv(row, col))" @click="seatsToggle(row, col)">{{ seatConv(row, col) }}</b-button>
 					</b-button-group>
 				</b-button-group>
 			</b-col>
@@ -85,17 +85,14 @@ export default {
 	},
 	created() {
 		this.$http.get('api/cinema', {})
-		.then((res) => {
-			this.cinemas = res.data
-		})
+		.then(({data}) => { this.cinemas = data })
+		
 		this.$http.get('api/movie', {
 			params: {
 				from: 1,
 				to: 100
 			}
-		}).then((res) => {
-			this.movies = res.data
-		})
+		}).then(({data}) => { this.movies = data })
 
 	},
 	methods: {
@@ -103,8 +100,7 @@ export default {
 			return `${String.fromCharCode(65 + row - 1)}${col}`
 		},
 		seatsToggle(row, col) {
-			var index = this.resForm.selectedSeats.indexOf(this.seatConv(row, col))
-			if (index > -1) {
+			if (this.resForm.selectedSeats.includes(this.seatConv(row, col))) {
 				this.resForm.selectedSeats.splice(index, 1)
 				if (this.resForm.adultNum > 0) this.resForm.adultNum--
 				else this.resForm.youthNum--
@@ -122,39 +118,32 @@ export default {
 					cinemaID: this.schForm.cinemaID,
 					date: this.schForm.date
                 }
-            }).then((res) => {
-				if (res.data.length == 0)
+            }).then(({data}) => {
+				if (data.length == 0)
 					this.curSch = {}
 
-				this.schedules = res.data
+				this.schedules = data
             })
 		},
 		reservate() {
-			var seatProc = []
+			var seatList = []
 			for (var x of this.resForm.selectedSeats) {
 				let obj = {
 					rowNo: x[0],
 					columnNo: x.slice(1)
 				}
-				seatProc.push(obj)
+				seatList.push(obj)
 			}
-			
             this.$http.post('api/reservate', {
 				cinemaID: this.schForm.cinemaID,
 				roomID: this.curSch.RoomID,
 				scheduleID: this.curSch.ScheduleID,
 				youthNum: this.resForm.youthNum,
-				selectedSeats: seatProc
-			}, {
-				headers: {
-					'Authorization': `Bearer ${sessionStorage['token']}`
-				}
-            }).then((res) => {
+				selectedSeats: seatList
+			}).then((res) => {
 				alert('Reservated successfully')
 				this.$router.push({ name: 'account' })
-			}).catch((err) => {
-				alert(err.response.data.message || err.message)
-			})
+			}).catch((err) => { alert(err.response.data.message || err.message) })
 		},
 	}
 }

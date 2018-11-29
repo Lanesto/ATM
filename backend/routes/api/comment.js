@@ -69,7 +69,7 @@ router.post('/', function(req, res, next) {
             b.rate,
             b.content,
             b.movieID,
-            decoded.UserID
+            decoded.userID
         ], function(err, result) {
             try {
                 if (err) {
@@ -109,10 +109,10 @@ router.delete('/:id', function(req, res, next) {
         DELETE FROM Comments \
         WHERE CommentID = :0 AND CustomerID = :1", [
             p.id,
-            decoded.UserID
+            decoded.userID
         ], function(err, result) {
             try {
-                console.log(`try: ${p.id}, ${decoded.UserID}`)
+                console.log(`try: ${p.id}, ${decoded.userID}`)
                 if (err) {
                     console.log(err);
                     throw 'DatabaseError';

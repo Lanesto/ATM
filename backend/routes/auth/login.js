@@ -26,8 +26,12 @@ module.exports = function(req, res, next) {
                     };
                     for (let i in obj) obj[i] = row.shift();
                     res.status(200).json({
-                        ...obj,
-                        accessToken: jwt.sign(obj, jwtConfig.secret, jwtConfig.options)
+                        userID: obj.UserID,
+                        userName: obj.UserName,
+                        accessToken: jwt.sign({
+                            userID: obj.UserID,
+                            userName: obj.UserName
+                        }, jwtConfig.secret, jwtConfig.options)
                     });
                 } else {
                     if (rows.length > 1) throw 'DatabaseError';

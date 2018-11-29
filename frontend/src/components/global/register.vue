@@ -1,32 +1,34 @@
 <template>
-    <div class="p-2">
+    <b-container class="p-2">
         <h2 class="mb-4">Register</h2>
         <b-form @submit.prevent="regRequest">
-            <b-input-group class="my-2" prepend="ID">
-                <b-form-input type="text" required v-model="id"/>
-            </b-input-group>
-            <b-input-group class="my-2" prepend="Password">
-                <b-form-input type="password" required v-model="password"/>
-            </b-input-group>
-            <b-input-group class="my-2" prepend="Name">
-                <b-form-input required v-model="name"/>
-            </b-input-group>
-            <b-input-group class="my-2" prepend="Age">
-                <b-form-input required v-model="age"/>
+            <b-form-input class="my-1" style="letter-spacing:4px;" type="text" required 
+                          :placeholder="id ? null : 'ID'"
+                          v-model="id"/>
+            <b-form-input class="my-1" style="letter-spacing:4px;" type="password" required 
+                          :placeholder="password ? null : 'Password'"
+                          v-model="password"/>
+            <b-form-input class="my-1" style="letter-spacing:4px;" type="text" required 
+                          :placeholder="name ? null : 'Name'"
+                          v-model="name"/>
+            <b-input-group class="my-1">
+                <b-form-input class="mr-1" style="letter-spacing:4px;" type="number" required
+                            :placeholder="age ? null : 'Age'" min="0" max="200"
+                            v-model="age"/>
                 <b-form-radio-group required
-                                    buttons button-variant="outline-success"
+                                    buttons button-variant="outline-secondary"
                                     v-model="gender">
                     <b-form-radio value="M">Male</b-form-radio>
                     <b-form-radio value="F">Female</b-form-radio>
                 </b-form-radio-group>
             </b-input-group>
-            <b-button class="mt-3" type="submit" 
-                        block variant="primary">Sign Up</b-button>
+            <b-button class="mt-2" type="submit"
+                      size="lg" block variant="primary">Sign Up</b-button>
             <b-button class="mt-1" type="button"
-                        block variant="success"
-                        @click="toLogin">Log In</b-button>
+                      size="lg" block variant="success"
+                      @click="toLogin">Log In</b-button>
         </b-form>
-    </div>
+    </b-container>
 </template>
 
 <script>
