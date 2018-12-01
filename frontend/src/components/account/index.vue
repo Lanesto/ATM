@@ -2,25 +2,50 @@
 	<div class="hello">
 		<b-container fluid>
 			<b-row class="my-4">
-				<b-col cols="8" sm="6">
+				<b-col>
 					<b-card :title="privates.CustomerID" 
 							:sub-title="`${privates.CustomerName} (${privates.Age}, ${privates.Gender})`">
-						<p class="mb-1 card-text">
-							Contact: {{ privates.ContactNumber }}
-						</p>
-						<p class="mb-1 card-text">
-							Address: {{ privates.Address }}
-						</p>
-						<p class="card-text">
-							Email: {{ privates.Email }}
-						</p>
+						<b-container class="p-1" fluid>
+							<b-row class="my-1">
+								<b-col sm="2" md="1"><label class="font-weight-bold" for="contactInput">Contact:</label></b-col>
+								<b-col>
+									<b-input id="contactInput" :style="editing ? null : styleObj"
+											 type="text" size="sm" :disabled="!editing"
+											 v-model="privates.ContactNumber"/>
+								</b-col>
+							</b-row>
+							<b-row class="my-1">
+								<b-col sm="2" md="1"><label class="font-weight-bold" for="addrInput">Address:</label></b-col>
+								<b-col>
+									<b-input id="addrInput" :style="editing ? null : styleObj"
+											 type="text" size="sm" :disabled="!editing"
+											 v-model="privates.Address"/>
+								</b-col>
+							</b-row>
+							<b-row class="my-1">
+								<b-col sm="2" md="1"><label class="font-weight-bold" for="emailInput">Email:</label></b-col>
+								<b-col>
+									<b-input id="emailInput" :style="editing ? null : styleObj"
+											 type="email" size="sm" :disabled="!editing"
+											 v-model="privates.Email"/>
+								</b-col>
+							</b-row>
+							<b-row class="mt-3 mr-2" align-h="start">
+								<b-button v-if="!editing" class="ml-3" variant="primary" @click="editing=true">Edit Profile</b-button>
+								<div v-else>
+									<b-button class="ml-3 mr-1" variant="secondary" @click="editing=false">Cancel</b-button>
+									<b-button class="mr-1" variant="success" @keyup.enter="updatePrivates" @click="updatePrivates">OK, Update!</b-button>
+									<b-button class="mr-1" variant="danger" @click="deleteAccount">Delete Account</b-button>
+								</div>
+							</b-row>
+						</b-container>
 					</b-card>
 				</b-col>
 			</b-row>
 			<b-row class="mt-2 px-3">
 				<b-table v-if="reservations.length > 0" hover :items="reservations" :fields="fields"
 						@row-clicked="cancelReservation"/>
-				<h2 class="mx-3 my-3" v-else>You have no reservations.</h2>
+				<h2 v-else class="mx-3 mt-3 mb-5">You have no reservations.</h2>
 			</b-row>
 		</b-container>
 	</div>
@@ -32,7 +57,14 @@ export default {
     name: 'account',
 	data () {
 		return {
+			// private info
 			privates: {},
+			editing: false,
+			styleObj: {
+				backgroundColor: 'white',
+				border: 'none'
+			},
+			// reserved tickets
             reservations: [],
             loadPoint: 1,
             loadCount: 5,
@@ -46,7 +78,6 @@ export default {
 				{
 					key: 'MovieTitle',
 					label: 'Movie',
-					sortable: false
 				},
 				{
 					key: 'TotalPrice',
@@ -56,12 +87,10 @@ export default {
 				{
 					key: 'AdultTicketCount',
 					label: 'Adult',
-					sortable: false
 				},
 				{
 					key: 'YouthTicketCount',
 					label: 'Youth',
-					sortable: false
 				},
 				{
 					key: 'ReservedDate',
@@ -76,19 +105,16 @@ export default {
 				{
 					key: 'RoomName',
 					label: 'Room',
-					sortable: false
 				},
 				{
 					key: 'Seats',
 					label: 'Seats',
-					sortable: false
 				},
 				{
 					key: 'PlayDate',
 					label: 'Play At',
 					sortable: true
 				}
-
 			]
 		}
 	},
@@ -98,15 +124,32 @@ export default {
 	},
 	methods: {
 		bringPrivates() {
-			this.$http.post('auth/account', {})
-			.then((res) => {
-				this.privates = res.data
-				if (this.privates.Gender == 'M') this.privates.Gender = 'Male'
-				else if (this.privates.Gender == 'F') this.privates.Gender = 'Female'
+			this.$http.get('auth/account', {})
+			.then(({data})=> {
+				if (data.Gender == 'M') data.Gender = 'Male'
+				else if (data.Gender == 'F') data.Gender = 'Female'
+
+				this.privates = data
             })
 		},
+		updatePrivates() {
+			this.$http.put('auth/account', {
+				contactNumber: this.privates.ContactNumber,
+				address: this.privates.Address,
+				email: this.privates.Email
+			}).then(res => { this.editing = false })
+			.catch(err => { alert(err.message) })
+		},
+		deleteAccount() {
+			if (!confirm('ALL ACCOUNT INFORMATIONS WILL BE DELETED.\n\nAre you sure?')) return;
+			this.$http.delete('auth/account')
+			.then(res => {
+				this.$store.dispatch('LOGOUT')
+				this.$router.replace({ name: 'home' })
+			}).catch(err => { alert(err.message) })
+		},
 		bringReservations() {
-            this.$http.post('auth/account/reservation', {
+            this.$http.get('auth/account/reservation', {
 					from: this.loadPoint,
 					to: this.loadPoint + this.loadCount - 1
 				}).then((res) => {
@@ -130,20 +173,9 @@ export default {
                 headers: {
                     'Authorization': `Bearer ${sessionStorage['token']}`
                 }
-            }).then((res) => {
+            }).then((res) => { 
 				this.reservations = this.reservations.filter(x => x.ReservationID != resID)
-            }).catch(err => {
-                var msg = ''
-                if (err.response) { // Response Error
-                    var res = err.response
-                    msg = res.data.message
-                } else if (err.request) { // Server Error
-                    msg = err.message
-                } else { // Request Error
-                    msg = err.message
-                }
-                alert(msg)
-            })
+            }).catch(err => { alert(err.message) })
 		}
 	}
 }

@@ -1,5 +1,5 @@
 module.exports = {
-    secret: 'ppap',
+    secret: 'apple',
     options: {
         expiresIn: '5m'
     }

@@ -29,16 +29,16 @@
 		<b-row class="mb-4">
 			<b-col cols="8">
 				<strong>Play At</strong>
-				<b-form-input type="date" v-model="schForm.date" @input="bringSchedules"/>
+				<b-form-input type="date" v-model="schForm.date" @change="bringSchedules"/>
 			</b-col>
 			<b-col cols="2">
 				<strong>Youth</strong>
-				<b-form-input type="number" min="0" :max="resForm.selectedSeats.length - resForm.adultNum" step="1" v-model="resForm.youthNum"
+				<b-form-input type="number" min="0" :max="resForm.selectedSeats.length" step="1" v-model="resForm.youthNum"
 							  @input="resForm.adultNum = resForm.selectedSeats.length - resForm.youthNum"/>
 			</b-col>
 			<b-col cols="2">
 				<strong>Adult</strong>
-				<b-form-input type="number" min="0" :max="resForm.selectedSeats.length - resForm.youthNum" step="1" v-model="resForm.adultNum"
+				<b-form-input type="number" min="0" :max="resForm.selectedSeats.length" step="1" v-model="resForm.adultNum"
 							  @input="resForm.youthNum = resForm.selectedSeats.length - resForm.adultNum"/>
 			</b-col>
 		</b-row>
@@ -88,7 +88,7 @@ export default {
 		.then(({data}) => { this.cinemas = data })
 		
 		this.$http.get('api/movie', {
-			params: {
+			params: { // make the app simple becuz this is prototype
 				from: 1,
 				to: 100
 			}
@@ -100,18 +100,21 @@ export default {
 			return `${String.fromCharCode(65 + row - 1)}${col}`
 		},
 		seatsToggle(row, col) {
-			if (this.resForm.selectedSeats.includes(this.seatConv(row, col))) {
-				this.resForm.selectedSeats.splice(index, 1)
+			var selection = this.resForm.selectedSeats
+			var index = selection.indexOf(this.seatConv(row, col))
+			if (index != -1) {
+				selection.splice(index, 1)
 				if (this.resForm.adultNum > 0) this.resForm.adultNum--
 				else this.resForm.youthNum--
-			} else if (this.resForm.selectedSeats.length < 10) {
-				this.resForm.selectedSeats.push(this.seatConv(row, col))
-				this.resForm.adultNum = this.resForm.selectedSeats.length - this.resForm.youthNum
+			} else if (selection.length < 10) {
+				selection.push(this.seatConv(row, col))
+				this.resForm.adultNum = selection.length - this.resForm.youthNum
 			} else {
 				alert('Cannot reserve more than 10 seats')
 			}
 		},
 		bringSchedules() {
+			if (this.schForm.movieID < 0 || this.schForm.cinemaID < 0 || !this.schForm) return
             this.$http.get('api/reservate', {
                 params: {
                     movieID: this.schForm.movieID,
@@ -119,16 +122,14 @@ export default {
 					date: this.schForm.date
                 }
             }).then(({data}) => {
-				if (data.length == 0)
-					this.curSch = {}
-
+				if (data.length == 0) this.curSch = {}
 				this.schedules = data
             })
 		},
 		reservate() {
 			var seatList = []
 			for (var x of this.resForm.selectedSeats) {
-				let obj = {
+				let obj = { // this part is also simplified(prototype)
 					rowNo: x[0],
 					columnNo: x.slice(1)
 				}

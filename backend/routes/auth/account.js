@@ -4,9 +4,9 @@ var oracledb = require('../../db/oracledb');
 var jwt = require('jsonwebtoken');
 var jwtConfig = require('../../secrets/jwt_config');
 
-router.post('/', function(req, res, next) {
+router.get('/', function(req, res, next) {
     let token = (req.get('Authorization')).split(' ')[1];
-    console.log(`auth/account(post): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
+    console.log(`auth/account(get): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {
         let decoded = jwt.verify(token, jwtConfig.secret);
         if (!decoded) throw 'InvalidTokenError';
@@ -23,7 +23,7 @@ router.post('/', function(req, res, next) {
             decoded.userID,
         ], function(err, result) {
             if (err) console.log(err);
-            else {
+            else if (result.rows.length) {
                 let row = result.rows[0];
                 let obj = {
                     CustomerID: '',
@@ -41,7 +41,7 @@ router.post('/', function(req, res, next) {
     } catch(e) {
         if (e == 'InvalidTokenError' || e.name == 'TokenExpiredError' || e.name == 'JsonWebTokenError') {
             res.status(401).send({ message: 'Expired or Invalid Token' });
-            console.log('auth/account(post): searching for information failed, invalid token');
+            console.log('auth/account(get): searching for information failed, invalid token');
         } else {
             res.status(500).send({ message: 'Internal Server Error' })
             console.log(e);
@@ -49,10 +49,70 @@ router.post('/', function(req, res, next) {
     }
 });
 
-router.post('/reservation', function(req, res, next) {
+router.put('/', function(req, res, next) {
     let token = (req.get('Authorization')).split(' ')[1];
     let b = req.body;
-    console.log(`auth/account/reservation(post): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
+    console.log(`auth/account(put): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
+    try {
+        let decoded = jwt.verify(token, jwtConfig.secret);
+        if (!decoded) throw 'InvalidTokenError';
+        oracledb.bind("\
+        UPDATE Customers \
+        SET ContactNumber = :0, \
+            Address = :1, \
+            Email = :2 \
+        WHERE CustomerID = :3", [
+            b.contactNumber,
+            b.address,
+            b.email,
+            decoded.userID,
+        ], function(err, result) {
+            if (err) console.log(err);
+            else {
+                res.status(200).send({ message: 'Updated successfully' })
+            }
+        });
+    } catch(e) {
+        if (e == 'InvalidTokenError' || e.name == 'TokenExpiredError' || e.name == 'JsonWebTokenError') {
+            res.status(401).send({ message: 'Expired or Invalid Token' });
+            console.log('auth/account(put): searching for information failed, invalid token');
+        } else {
+            res.status(500).send({ message: 'Internal Server Error' })
+            console.log(e);
+        }
+    }
+});
+
+router.delete('/', function(req, res, next) {
+    let token = (req.get('Authorization')).split(' ')[1];
+    console.log(`auth/account(delete): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
+    try {
+        let decoded = jwt.verify(token, jwtConfig.secret);
+        if (!decoded) throw 'InvalidTokenError';
+        oracledb.bind("\
+        DELETE FROM Customers \
+        WHERE CustomerID = :0", [
+            decoded.userID,
+        ], function(err, result) {
+            if (err) console.log(err);
+            else {
+                res.status(200).send({ message: 'Account has been deleted successfully' })
+            }
+        });
+    } catch(e) {
+        if (e == 'InvalidTokenError' || e.name == 'TokenExpiredError' || e.name == 'JsonWebTokenError') {
+            res.status(401).send({ message: 'Expired or Invalid Token' });
+            console.log('auth/account(delete): searching for information failed, invalid token');
+        } else {
+            res.status(500).send({ message: 'Internal Server Error' })
+            console.log(e);
+        }
+    }
+});
+
+router.get('/reservation', function(req, res, next) {
+    let token = (req.get('Authorization')).split(' ')[1];
+    console.log(`auth/account/reservation(get): incoming token ${token.slice(0, 9)} ~ ${token.slice(-9)}`);
     try {
         let decoded = jwt.verify(token, jwtConfig.secret);
         if (!decoded) throw 'InvalidTokenError';
@@ -121,14 +181,14 @@ router.post('/reservation', function(req, res, next) {
                     for (let j in obj) obj[j] = row.shift();
                     arr.push(obj);
                 }
-                console.log(`auth/account/reservation(post): fetched ${arr.length} row(s)`);
+                console.log(`auth/account/reservation(get): fetched ${arr.length} row(s)`);
                 res.json(arr);
             }
         });
     } catch(e) {
         if (e == 'InvalidTokenError' || e.name == 'TokenExpiredError' || e.name == 'JsonWebTokenError') {
             res.status(401).send({ message: 'Expired or Invalid Token' });
-            console.log('auth/account/reservation(post): listing reservations failed, invalid token');
+            console.log('auth/account/reservation(get): listing reservations failed, invalid token');
         } else {
             res.status(500).send({ message: 'Internal Server Error' })
             console.log(e);
