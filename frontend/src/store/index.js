@@ -62,7 +62,7 @@ const store = new Vuex.Store({
     }
 })
 
-const loadAccessToken = () => {
+const loadAccessToken = () => { // when user refreshes page
     try {
         const sessionData = JSON.parse(localStorage.sessionData)
         if (!sessionData.accessToken)

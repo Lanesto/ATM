@@ -14,9 +14,10 @@ export default {
         }
     },
     created() {
-        setInterval(() => {
+        var timerID = setInterval(() => {
             if (--this.remaining === 0) {
                 this.$router.replace({ name: 'home' })
+                clearInterval(timerID)
             }
         }, 1000);
     }

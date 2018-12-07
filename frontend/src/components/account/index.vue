@@ -34,7 +34,7 @@
 								<b-button v-if="!editing" class="ml-3" variant="primary" @click="editing=true">Edit Profile</b-button>
 								<div v-else>
 									<b-button class="ml-3 mr-1" variant="secondary" @click="editing=false">Cancel</b-button>
-									<b-button class="mr-1" variant="success" @keyup.enter="updatePrivates" @click="updatePrivates">OK, Update!</b-button>
+									<b-button class="mr-1" variant="success" @click="updatePrivates">OK, Update!</b-button>
 									<b-button class="mr-1" variant="danger" @click="deleteAccount">Delete Account</b-button>
 								</div>
 							</b-row>
@@ -141,7 +141,7 @@ export default {
 			.catch(err => { alert(err.message) })
 		},
 		deleteAccount() {
-			if (!confirm('ALL ACCOUNT INFORMATIONS WILL BE DELETED.\n\nAre you sure?')) return;
+			if (!confirm('ALL ACCOUNT INFORMATIONS WILL BE DELETED PERMANENTLY.\n\n  Are you sure?')) return;
 			this.$http.delete('auth/account')
 			.then(res => {
 				this.$store.dispatch('LOGOUT')
@@ -169,11 +169,8 @@ export default {
 			if (!answer) {
 				return
 			}
-            this.$http.delete(`api/reservate/${resID}`, {
-                headers: {
-                    'Authorization': `Bearer ${sessionStorage['token']}`
-                }
-            }).then((res) => { 
+			this.$http.delete(`api/reservate/${resID}`)
+			.then((res) => { 
 				this.reservations = this.reservations.filter(x => x.ReservationID != resID)
             }).catch(err => { alert(err.message) })
 		}
